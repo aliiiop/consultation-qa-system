@@ -1,12 +1,14 @@
 {
   "name": "consultation-qa-system",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+    "client": "npm --prefix client run dev",
+    "server": "npm --prefix server run dev",
+    "build": "npm --prefix client run build",
+    "seed": "npm --prefix server run seed",
+    "export:data": "npm --prefix server run export:data",
+    "import:data": "npm --prefix server run import:data",
+    "start": "npm --prefix server start"
+  }
 }

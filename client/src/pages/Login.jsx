@@ -1,112 +1,98 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useContext, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { NotificationContext } from '../context/NotificationContext'
 
 function Login() {
   const navigate = useNavigate()
+  const { error: showError, success: showSuccess } = useContext(NotificationContext)
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
-  const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-    if (errors[e.target.name]) {
-      setErrors({
-        ...errors,
-        [e.target.name]: ''
-      })
-    }
+  const handleChange = (event) => {
+    const { name, value } = event.target
+    setFormData((current) => ({ ...current, [name]: value }))
   }
 
-  const validateForm = () => {
-    const newErrors = {}
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email обязателен'
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Некорректный email'
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Пароль обязателен'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
+  const handleSubmit = async (event) => {
+    event.preventDefault()
 
     try {
       setLoading(true)
       const response = await axios.post('/api/auth/login', formData)
-      
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
-      
-      alert('Вход выполнен успешно!')
+      window.dispatchEvent(new Event('authchange'))
+      showSuccess(`С возвращением, ${response.data.user.name}!`)
       navigate('/')
-      window.location.reload()
     } catch (error) {
       console.error('Ошибка входа:', error)
-      alert(error.response?.data?.message || 'Ошибка входа. Проверьте данные.')
+      showError(error.response?.data?.message || 'Не удалось войти')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div style={{ maxWidth: '500px', margin: '0 auto' }}>
-      <h1 style={{ marginBottom: '2rem', textAlign: 'center' }}>Вход в систему</h1>
-      
-      <div className="card">
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Email *</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="example@mail.com"
-            />
-            {errors.email && <div className="error">{errors.email}</div>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Пароль *</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Введите пароль"
-            />
-            {errors.password && <div className="error">{errors.password}</div>}
-          </div>
-
-          <button type="submit" className="btn" disabled={loading} style={{ width: '100%' }}>
-            {loading ? 'Вход...' : 'Войти'}
-          </button>
-        </form>
-
-        <p style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-          Нет аккаунта? <Link to="/register" style={{ color: '#3498db' }}>Зарегистрироваться</Link>
+    <div className="auth-shell">
+      <section className="surface auth-side">
+        <span className="eyebrow">Login</span>
+        <h1>Войти в TopicHub</h1>
+        <p>
+          После входа можно публиковать вопросы, отвечать, голосовать и бронировать консультации.
         </p>
-      </div>
+        <ul className="plain-list">
+          <li>Лента вопросов с категориями</li>
+          <li>Ответы от пользователей и экспертов</li>
+          <li>Консультации с менторами из базы</li>
+        </ul>
+      </section>
+
+      <form onSubmit={handleSubmit} className="surface form-card form-stack auth-form">
+        <div className="section-head simple">
+          <div>
+            <span className="eyebrow">Авторизация</span>
+            <h2>Продолжить работу</h2>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="example@mail.com"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Пароль</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Минимум 6 символов"
+            required
+          />
+        </div>
+
+        <button type="submit" className="btn" disabled={loading}>
+          {loading ? 'Вход...' : 'Войти'}
+        </button>
+
+        <p className="muted-text">
+          Нет аккаунта? <Link to="/register" className="text-link">Создать</Link>
+        </p>
+      </form>
     </div>
   )
 }

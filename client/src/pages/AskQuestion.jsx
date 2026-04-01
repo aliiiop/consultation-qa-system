@@ -1,140 +1,187 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useContext, useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { NotificationContext } from '../context/NotificationContext'
+import { ASK_GUIDES, QUESTION_CATEGORIES } from '../data/platform'
 
 function AskQuestion() {
   const navigate = useNavigate()
+  const { error: showError, success: showSuccess, warning: showWarning } = useContext(NotificationContext)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: ''
+    category: '',
+    tags: ''
   })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-    // Очистка ошибки при изменении поля
-    if (errors[e.target.name]) {
-      setErrors({
-        ...errors,
-        [e.target.name]: ''
-      })
-    }
+  const tips = useMemo(() => ASK_GUIDES[formData.category] || [], [formData.category])
+
+  const handleChange = (event) => {
+    const { name, value } = event.target
+    setFormData((current) => ({ ...current, [name]: value }))
+    setErrors((current) => ({ ...current, [name]: '' }))
   }
 
   const validateForm = () => {
-    const newErrors = {}
+    const nextErrors = {}
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Заголовок обязателен'
-    } else if (formData.title.length < 10) {
-      newErrors.title = 'Заголовок должен содержать минимум 10 символов'
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = 'Описание обязательно'
-    } else if (formData.description.length < 20) {
-      newErrors.description = 'Описание должно содержать минимум 20 символов'
+      nextErrors.title = 'Напиши краткий заголовок'
+    } else if (formData.title.trim().length < 10) {
+      nextErrors.title = 'Минимум 10 символов'
     }
 
     if (!formData.category) {
-      newErrors.category = 'Выберите категорию'
+      nextErrors.category = 'Выбери раздел'
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    if (!formData.description.trim()) {
+      nextErrors.description = 'Опиши ситуацию подробнее'
+    } else if (formData.description.trim().length < 20) {
+      nextErrors.description = 'Минимум 20 символов'
+    }
+
+    const tags = formData.tags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+
+    if (tags.length > 6) {
+      nextErrors.tags = 'Сделай не больше 6 тегов'
+    }
+
+    setErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (event) => {
+    event.preventDefault()
 
     if (!validateForm()) {
+      showWarning('Проверь обязательные поля')
       return
     }
 
     const token = localStorage.getItem('token')
     if (!token) {
-      alert('Пожалуйста, войдите в систему')
+      showWarning('Нужно войти в аккаунт, чтобы публиковать вопросы')
       navigate('/login')
       return
     }
 
     try {
       setLoading(true)
-      await axios.post('/api/questions', formData, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+
+      const tags = formData.tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter(Boolean)
+
+      await axios.post('/api/questions', {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        category: formData.category,
+        tags
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       })
-      alert('Вопрос успешно добавлен!')
+
+      showSuccess('Вопрос опубликован')
       navigate('/questions')
     } catch (error) {
-      console.error('Ошибка при добавлении вопроса:', error)
-      alert(error.response?.data?.message || 'Ошибка при добавлении вопроса')
+      console.error('Ошибка публикации вопроса:', error)
+      showError(error.response?.data?.message || 'Не удалось опубликовать вопрос')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div>
-      <h1 style={{ marginBottom: '2rem' }}>Задать вопрос</h1>
-      
-      <div className="card">
-        <form onSubmit={handleSubmit}>
+    <div className="page-stack">
+      <section className="page-intro">
+        <div>
+          <span className="eyebrow">Новый пост</span>
+          <h1>Опубликовать вопрос</h1>
+          <p>
+            Здесь важен не просто красивый блок формы. Вопросы проходят валидацию,
+            попадают в правильный раздел и после сид-наполнения живут рядом с ответами других пользователей.
+          </p>
+        </div>
+      </section>
+
+      <section className="editor-layout">
+        <form onSubmit={handleSubmit} className="surface form-card form-stack">
           <div className="form-group">
-            <label htmlFor="title">Заголовок вопроса *</label>
+            <label htmlFor="title">Заголовок</label>
             <input
-              type="text"
               id="title"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="Кратко опишите ваш вопрос"
+              placeholder="Например: как выбрать корпус для тихой сборки?"
             />
-            {errors.title && <div className="error">{errors.title}</div>}
+            {errors.title && <span className="error">{errors.title}</span>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="category">Категория *</label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              <option value="">Выберите категорию</option>
-              <option value="programming">Программирование</option>
-              <option value="design">Дизайн</option>
-              <option value="marketing">Маркетинг</option>
-              <option value="business">Бизнес</option>
-              <option value="education">Образование</option>
-              <option value="other">Другое</option>
+            <label htmlFor="category">Раздел</label>
+            <select id="category" name="category" value={formData.category} onChange={handleChange}>
+              <option value="">Выбери раздел</option>
+              {QUESTION_CATEGORIES.map((category) => (
+                <option key={category.id} value={category.id}>{category.label}</option>
+              ))}
             </select>
-            {errors.category && <div className="error">{errors.category}</div>}
+            {errors.category && <span className="error">{errors.category}</span>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Подробное описание *</label>
+            <label htmlFor="tags">Теги</label>
+            <input
+              id="tags"
+              name="tags"
+              value={formData.tags}
+              onChange={handleChange}
+              placeholder="апгрейд, airflow, budget"
+            />
+            {errors.tags && <span className="error">{errors.tags}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="description">Описание</label>
             <textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder="Опишите ваш вопрос подробно..."
+              placeholder="Опиши задачу, ограничения, что уже пробовал и какой результат хочешь получить."
             />
-            {errors.description && <div className="error">{errors.description}</div>}
+            {errors.description && <span className="error">{errors.description}</span>}
           </div>
 
-          <button type="submit" className="btn" disabled={loading}>
-            {loading ? 'Отправка...' : 'Опубликовать вопрос'}
-          </button>
+          <div className="button-row">
+            <button type="submit" className="btn" disabled={loading}>
+              {loading ? 'Публикация...' : 'Опубликовать вопрос'}
+            </button>
+            <Link to="/questions" className="btn btn-ghost">Отмена</Link>
+          </div>
         </form>
-      </div>
+
+        <aside className="surface sidebar-card">
+          <span className="eyebrow">Подсказки</span>
+          <h3>Как получить сильный ответ</h3>
+          <ul className="plain-list">
+            {tips.length ? tips.map((tip) => <li key={tip}>{tip}</li>) : (
+              <>
+                <li>Выбери подходящий раздел</li>
+                <li>Опиши контекст и ограничения</li>
+                <li>Сформулируй ожидаемый результат</li>
+              </>
+            )}
+          </ul>
+        </aside>
+      </section>
     </div>
   )
 }

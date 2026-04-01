@@ -1,6 +1,26 @@
 import mongoose from 'mongoose'
+import {
+  CONSULTATION_BUDGETS,
+  CONSULTATION_FORMATS,
+  CONSULTATION_SERVICE_IDS,
+  CONSULTATION_STATUSES
+} from '../constants/platform.js'
 
 const consultationSchema = new mongoose.Schema({
+  seedKey: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  isSeeded: {
+    type: Boolean,
+    default: false
+  },
+  serviceCategory: {
+    type: String,
+    required: [true, 'Тип консультации обязателен'],
+    enum: CONSULTATION_SERVICE_IDS
+  },
   topic: {
     type: String,
     required: [true, 'Тема консультации обязательна'],
@@ -10,6 +30,11 @@ const consultationSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Описание обязательно']
   },
+  goal: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -18,6 +43,16 @@ const consultationSchema = new mongoose.Schema({
   expert: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
+  },
+  format: {
+    type: String,
+    enum: CONSULTATION_FORMATS,
+    default: 'chat'
+  },
+  budget: {
+    type: String,
+    enum: CONSULTATION_BUDGETS,
+    default: 'standard'
   },
   preferredDate: {
     type: Date,
@@ -29,16 +64,15 @@ const consultationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+    enum: CONSULTATION_STATUSES,
     default: 'pending'
   },
   notes: {
-    type: String
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+    type: String,
+    default: ''
   }
+}, {
+  timestamps: true
 })
 
 const Consultation = mongoose.model('Consultation', consultationSchema)

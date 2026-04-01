@@ -4,84 +4,87 @@ import User from '../models/User.js'
 
 const router = express.Router()
 
-// Генерация JWT токена
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d'
-  })
-}
+const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, {
+  expiresIn: '30d'
+})
 
-// @route   POST /api/auth/register
-// @desc    Регистрация нового пользователя
-// @access  Public
+const buildUserPayload = (user) => ({
+  _id: user._id,
+  username: user.username,
+  email: user.email,
+  name: user.name || user.username,
+  role: user.role,
+  headline: user.headline,
+  bio: user.bio,
+  expertise: user.expertise,
+  reputation: user.reputation,
+  location: user.location,
+  createdAt: user.createdAt
+})
+
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body
 
-    // Проверка существования пользователя
     const userExists = await User.findOne({ $or: [{ email }, { username }] })
 
     if (userExists) {
-      return res.status(400).json({ 
-        message: 'Пользователь с таким email или именем уже существует' 
+      if (userExists.email === email) {
+        return res.status(409).json({
+          message: 'Пользователь с таким email уже существует'
+        })
+      }
+
+      return res.status(400).json({
+        message: 'Пользователь с таким именем уже существует'
       })
     }
 
-    // Создание пользователя
     const user = await User.create({
       username,
       email,
       password
     })
 
-    if (user) {
-      res.status(201).json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id)
-      })
-    } else {
-      res.status(400).json({ message: 'Некорректные данные пользователя' })
-    }
+    const userPayload = buildUserPayload(user)
+
+    res.status(201).json({
+      ...userPayload,
+      token: generateToken(user._id),
+      user: userPayload
+    })
   } catch (error) {
     console.error('Ошибка регистрации:', error)
-    res.status(500).json({ message: 'Ошибка сервера при регистрации' })
+    res.status(500).json({
+      message: 'Ошибка сервера при регистрации',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    })
   }
 })
 
-// @route   POST /api/auth/login
-// @desc    Вход пользователя
-// @access  Public
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body
-
-    // Поиск пользователя
     const user = await User.findOne({ email })
 
     if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
+      return res.json({
         token: generateToken(user._id),
-        user: {
-          _id: user._id,
-          username: user.username,
-          email: user.email,
-          role: user.role,
-          createdAt: user.createdAt
-        }
+        user: buildUserPayload(user)
       })
-    } else {
-      res.status(401).json({ message: 'Неверный email или пароль' })
     }
+
+    if (!user) {
+      return res.status(404).json({ message: 'Пользователь не найден' })
+    }
+
+    return res.status(401).json({ message: 'Неверный пароль' })
   } catch (error) {
     console.error('Ошибка входа:', error)
-    res.status(500).json({ message: 'Ошибка сервера при входе' })
+    res.status(500).json({
+      message: 'Ошибка сервера при входе',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    })
   }
 })
 

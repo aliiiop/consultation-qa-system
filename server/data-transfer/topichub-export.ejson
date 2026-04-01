@@ -1,0 +1,921 @@
+{
+  "app": "TopicHub",
+  "version": 1,
+  "database": "consultation-qa",
+  "exportedAt": {
+    "$date": "2026-04-01T07:12:20.861Z"
+  },
+  "counts": {
+    "users": 11,
+    "questions": 6,
+    "consultations": 4
+  },
+  "collections": {
+    "users": [
+      {
+        "_id": {
+          "$oid": "69cab7bcfb3ae0d6aca9a913"
+        },
+        "username": "alistest",
+        "email": "aleka420283@gmail.com",
+        "password": "$2a$10$dEW56zTt4ootK..QJOkl9OQVdaW9NU8.NX6a4mwW1nUAWbprBt3RK",
+        "role": "user",
+        "name": "alistest",
+        "createdAt": {
+          "$date": "2026-03-30T17:49:48.025Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb11f58a496ca4e0344f"
+        },
+        "seedKey": "expert-arsen-pc",
+        "isSeeded": true,
+        "name": "Арсен",
+        "username": "arsen_builds",
+        "email": "arsen@topichub.demo",
+        "password": "$2a$10$pYkjcfp5JTxqashJvuspieSnzVav5MpqNBNJmvaKIkXAOL6OMbgEW",
+        "headline": "Собираю ПК без переплат и случайных несовместимостей",
+        "bio": "Помогаю выбрать комплектующие под реальный бюджет, а не под маркетинговые лозунги.",
+        "expertise": [
+          "Сборки ПК",
+          "Апгрейд",
+          "Охлаждение"
+        ],
+        "location": "Астана",
+        "reputation": 940,
+        "role": "expert",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:49.650Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:15.477Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb11f58a496ca4e03455"
+        },
+        "seedKey": "expert-aida-cooking",
+        "isSeeded": true,
+        "name": "Аида",
+        "username": "aida_kitchen",
+        "email": "aida@topichub.demo",
+        "password": "$2a$10$tlYMkEoJulkG3kuizw1ee.voe0DJSsgc15PEUODrZgLCVvIO48BiO",
+        "headline": "Упрощаю готовку без потери вкуса",
+        "bio": "Разбираю блюда по шагам, подбираю замены ингредиентов и помогаю собрать меню на неделю.",
+        "expertise": [
+          "Рецепты",
+          "План питания",
+          "Домашняя кухня"
+        ],
+        "location": "Алматы",
+        "reputation": 870,
+        "role": "expert",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:49.726Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:15.551Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb11f58a496ca4e03459"
+        },
+        "seedKey": "expert-dana-study",
+        "isSeeded": true,
+        "name": "Дана",
+        "username": "dana_studyflow",
+        "email": "dana@topichub.demo",
+        "password": "$2a$10$4X1/qkLTnPBSPRm3OykhIeN/cGp.iDyftYi/bqgLDJJbGKDmewRoK",
+        "headline": "Строю понятные учебные маршруты без хаоса",
+        "bio": "Помогаю упаковать подготовку к экзаменам и курсовым в реалистичный план.",
+        "expertise": [
+          "Учеба",
+          "Тайм-менеджмент",
+          "Проекты"
+        ],
+        "location": "Шымкент",
+        "reputation": 910,
+        "role": "expert",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:49.787Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:15.624Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb11f58a496ca4e0345d"
+        },
+        "seedKey": "expert-murat-career",
+        "isSeeded": true,
+        "name": "Мурат",
+        "username": "murat_review",
+        "email": "murat@topichub.demo",
+        "password": "$2a$10$iwacEpHD.oA2.sqyQ4M2VOzoh.v3M/XPWXE5YR8AfnhC9O0zl1jV.",
+        "headline": "Ревью резюме, портфолио и карьерных шагов",
+        "bio": "Работаю с позиционированием начинающих специалистов и упаковкой проектов.",
+        "expertise": [
+          "Карьера",
+          "Резюме",
+          "Портфолио"
+        ],
+        "location": "Караганда",
+        "reputation": 980,
+        "role": "expert",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:49.848Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:15.700Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb11f58a496ca4e03461"
+        },
+        "seedKey": "user-sasha",
+        "isSeeded": true,
+        "name": "Саша",
+        "username": "sasha_play",
+        "email": "sasha@topichub.demo",
+        "password": "$2a$10$HGXJ3W4iIT26zjYOh4mME.wSbPyP3v93Grx9jom7Wo5nxVmaS6Ma.",
+        "headline": "Люблю коопы, бюджетные девайсы и быстрые ответы по делу",
+        "bio": "Часто спрашиваю про игры, железо и бытовые штуки.",
+        "expertise": [
+          "Игры",
+          "Девайсы"
+        ],
+        "location": "Павлодар",
+        "reputation": 210,
+        "role": "user",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:49.910Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:15.773Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb11f58a496ca4e03465"
+        },
+        "seedKey": "user-lena",
+        "isSeeded": true,
+        "name": "Лена",
+        "username": "lena_home",
+        "email": "lena@topichub.demo",
+        "password": "$2a$10$KkhBm/hbSjp4NDY/iUaLkOmoy53ousVxfNmnYgdOw/0Cu6O24M.0a",
+        "headline": "Ищу практичные решения без лишней воды",
+        "bio": "Спрашиваю про рецепты, планирование и повседневные задачи.",
+        "expertise": [
+          "Готовка",
+          "Организация"
+        ],
+        "location": "Костанай",
+        "reputation": 175,
+        "role": "user",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:49.973Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:15.842Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e03469"
+        },
+        "seedKey": "user-ilya",
+        "isSeeded": true,
+        "name": "Илья",
+        "username": "ilya_notes",
+        "email": "ilya@topichub.demo",
+        "password": "$2a$10$JZ70Ox03Iu1xr7IYPTQR1.NihFTJpu/R689ICbGkF/tFXM0Z2u71m",
+        "headline": "Учеба, дедлайны и проектные разборы",
+        "bio": "Собираю советы по учебе и иногда отвечаю на вопросы по заметкам и планированию.",
+        "expertise": [
+          "Учеба",
+          "Конспекты"
+        ],
+        "location": "Семей",
+        "reputation": 320,
+        "role": "user",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.033Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:15.912Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e0346d"
+        },
+        "seedKey": "user-nika",
+        "isSeeded": true,
+        "name": "Ника",
+        "username": "nika_frames",
+        "email": "nika@topichub.demo",
+        "password": "$2a$10$NATlPs71vGmWNz7YXmfeIeNvetB203Y03o3ZkfXWRCYhRjy4Iw5N.",
+        "headline": "Иногда задаю вопросы, иногда вытаскиваю полезные ответы из хаоса",
+        "bio": "Люблю нормальную структуру и короткие списки без кликбейта.",
+        "expertise": [
+          "Карьера",
+          "Контент"
+        ],
+        "location": "Тараз",
+        "reputation": 285,
+        "role": "user",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.094Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:15.982Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e03471"
+        },
+        "seedKey": "user-timur",
+        "isSeeded": true,
+        "name": "Тимур",
+        "username": "timur_case",
+        "email": "timur@topichub.demo",
+        "password": "$2a$10$ibyA.VX6wc2hdFN9LIzBNeusvZSOq5TMEgzBnCJH817DRqGcCO.Ei",
+        "headline": "Задаю бытовые и технические вопросы, когда не хочу искать по десяти форумам",
+        "bio": "Обычно спрашиваю по железу, играм и полезным привычкам.",
+        "expertise": [
+          "ПК",
+          "Повседневность"
+        ],
+        "location": "Актобе",
+        "reputation": 248,
+        "role": "user",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.155Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:16.052Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caed7b052b069f8395a0f0"
+        },
+        "seedKey": "admin-topichub",
+        "isSeeded": true,
+        "name": "Администратор",
+        "username": "topichub_admin",
+        "email": "admin@topichub.demo",
+        "password": "$2a$10$qhNkNKA7UrQBfVbH3wRLLuKhqNUxFRPRvS7p9E65bKWq5lX27gDCi",
+        "headline": "Управление платформой, модерация и контроль контента",
+        "bio": "Системный администратор платформы. Используется для модерации и административного доступа.",
+        "expertise": [
+          "Модерация",
+          "Управление платформой",
+          "Администрирование"
+        ],
+        "location": "Astana IT University",
+        "reputation": 1500,
+        "role": "admin",
+        "createdAt": {
+          "$date": "2026-03-30T21:39:07.803Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:15.381Z"
+        },
+        "__v": 0
+      }
+    ],
+    "questions": [
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e03474"
+        },
+        "seedKey": "q-pc-airflow",
+        "isSeeded": true,
+        "title": "Как собрать тихий ПК для игр и монтажа без переплаты за “премиум” корпус?",
+        "description": "Нужен системник примерно под 900 000 тенге. Играю в Cyberpunk и Apex, иногда монтирую ролики в Premiere. Хочу, чтобы корпус не гудел как пылесос, но и не был просто дорогой коробкой. На что смотреть по вентиляторам, башне и расположению блоков?",
+        "category": "pc",
+        "tags": [
+          "корпус",
+          "охлаждение",
+          "сборка",
+          "игры"
+        ],
+        "author": {
+          "$oid": "69caeb12f58a496ca4e03471"
+        },
+        "answers": [
+          {
+            "content": "Смотри на сетчатый фронт, минимум три вентилятора в комплекте и корпус, куда влезает нормальная башня 160 мм+. Самая частая ошибка: покупают красивый закрытый корпус и потом поднимают обороты, чтобы компенсировать плохой приток воздуха. Если бюджет около 900к, лучше вложиться в тихие вентиляторы и нормальный кулер, чем переплачивать за стекло и RGB.",
+            "author": {
+              "$oid": "69caeb11f58a496ca4e0344f"
+            },
+            "upvotes": [
+              {
+                "$oid": "69caeb12f58a496ca4e03471"
+              },
+              {
+                "$oid": "69caeb11f58a496ca4e03461"
+              },
+              {
+                "$oid": "69caeb12f58a496ca4e03469"
+              }
+            ],
+            "downvotes": [],
+            "isBestAnswer": true,
+            "createdAt": {
+              "$date": "2026-03-30T22:07:16.120Z"
+            },
+            "_id": {
+              "$oid": "69caf4148e0ed6d37fb015f5"
+            }
+          },
+          {
+            "content": "Еще проверь, насколько удобно чистить пылевые фильтры. Если их неудобно снимать, корпус быстро начнет шуметь сильнее просто из-за грязи.",
+            "author": {
+              "$oid": "69caeb12f58a496ca4e0346d"
+            },
+            "upvotes": [
+              {
+                "$oid": "69caeb11f58a496ca4e03465"
+              }
+            ],
+            "downvotes": [],
+            "isBestAnswer": false,
+            "createdAt": {
+              "$date": "2026-03-30T22:07:16.120Z"
+            },
+            "_id": {
+              "$oid": "69caf4148e0ed6d37fb015f6"
+            }
+          }
+        ],
+        "views": 182,
+        "upvotes": [
+          {
+            "$oid": "69caeb11f58a496ca4e0344f"
+          },
+          {
+            "$oid": "69caeb11f58a496ca4e03461"
+          },
+          {
+            "$oid": "69caeb12f58a496ca4e03469"
+          },
+          {
+            "$oid": "69caeb12f58a496ca4e0346d"
+          }
+        ],
+        "downvotes": [],
+        "status": "answered",
+        "lastActivityAt": {
+          "$date": "2026-03-30T22:07:16.127Z"
+        },
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.217Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:16.127Z"
+        },
+        "__v": 2
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e03479"
+        },
+        "seedKey": "q-games-coop",
+        "isSeeded": true,
+        "title": "Посоветуйте кооперативную игру на двоих, чтобы не требовала 100 часов влета",
+        "description": "Хочется что-то пройти вдвоем вечером после работы. Важно, чтобы игра не душила десятком систем сразу и давала ощущение прогресса уже в первые 2-3 сессии. Подойдут и сюжетные, и смешные варианты.",
+        "category": "games",
+        "tags": [
+          "кооп",
+          "steam",
+          "сюжет",
+          "вечером"
+        ],
+        "author": {
+          "$oid": "69caeb11f58a496ca4e03461"
+        },
+        "answers": [
+          {
+            "content": "Если нужен мягкий вход, возьмите It Takes Two. Она буквально построена так, чтобы каждый час подбрасывать новую механику и не утомлять повторением.",
+            "author": {
+              "$oid": "69caeb12f58a496ca4e03469"
+            },
+            "upvotes": [
+              {
+                "$oid": "69caeb11f58a496ca4e03461"
+              },
+              {
+                "$oid": "69caeb11f58a496ca4e03465"
+              },
+              {
+                "$oid": "69caeb11f58a496ca4e0345d"
+              }
+            ],
+            "downvotes": [],
+            "isBestAnswer": true,
+            "createdAt": {
+              "$date": "2026-03-30T22:07:16.130Z"
+            },
+            "_id": {
+              "$oid": "69caf4148e0ed6d37fb015fb"
+            }
+          },
+          {
+            "content": "Если хотите меньше платформинга и больше разговоров, попробуйте We Were Here. Там кайф именно в коммуникации и коротких сессиях.",
+            "author": {
+              "$oid": "69caeb11f58a496ca4e0345d"
+            },
+            "upvotes": [
+              {
+                "$oid": "69caeb12f58a496ca4e03471"
+              }
+            ],
+            "downvotes": [],
+            "isBestAnswer": false,
+            "createdAt": {
+              "$date": "2026-03-30T22:07:16.130Z"
+            },
+            "_id": {
+              "$oid": "69caf4148e0ed6d37fb015fc"
+            }
+          }
+        ],
+        "views": 143,
+        "upvotes": [
+          {
+            "$oid": "69caeb11f58a496ca4e03465"
+          },
+          {
+            "$oid": "69caeb12f58a496ca4e0346d"
+          },
+          {
+            "$oid": "69caeb11f58a496ca4e03459"
+          }
+        ],
+        "downvotes": [],
+        "status": "answered",
+        "lastActivityAt": {
+          "$date": "2026-03-30T22:07:16.133Z"
+        },
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.220Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:16.133Z"
+        },
+        "__v": 2
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e0347e"
+        },
+        "seedKey": "q-cooking-cream",
+        "isSeeded": true,
+        "title": "Чем заменить сливки в пасте, если хочется легче, но чтобы соус не стал водой?",
+        "description": "Готовлю пасту дома, сливки дают вкус, но иногда хочется сделать блюдо менее тяжелым. Пробовала молоко, но получается жидко и вообще не держится на пасте. Чем заменить и как не испортить текстуру?",
+        "category": "cooking",
+        "tags": [
+          "паста",
+          "соус",
+          "замены",
+          "рецепт"
+        ],
+        "author": {
+          "$oid": "69caeb11f58a496ca4e03465"
+        },
+        "answers": [
+          {
+            "content": "Самый рабочий вариант: немного греческого йогурта или мягкого творожного сыра плюс вода от пасты. Сначала снизь огонь, иначе кисломолочка может свернуться. Текстуру держит крахмал из воды, а вкус не уходит в пустоту.",
+            "author": {
+              "$oid": "69caeb11f58a496ca4e03455"
+            },
+            "upvotes": [
+              {
+                "$oid": "69caeb11f58a496ca4e03465"
+              },
+              {
+                "$oid": "69caeb12f58a496ca4e03469"
+              },
+              {
+                "$oid": "69caeb11f58a496ca4e03461"
+              },
+              {
+                "$oid": "69caeb12f58a496ca4e03471"
+              }
+            ],
+            "downvotes": [],
+            "isBestAnswer": true,
+            "createdAt": {
+              "$date": "2026-03-30T22:07:16.134Z"
+            },
+            "_id": {
+              "$oid": "69caf4148e0ed6d37fb01600"
+            }
+          }
+        ],
+        "views": 201,
+        "upvotes": [
+          {
+            "$oid": "69caeb11f58a496ca4e03455"
+          },
+          {
+            "$oid": "69caeb12f58a496ca4e0346d"
+          },
+          {
+            "$oid": "69caeb11f58a496ca4e03461"
+          }
+        ],
+        "downvotes": [],
+        "status": "answered",
+        "lastActivityAt": {
+          "$date": "2026-03-30T22:07:16.136Z"
+        },
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.223Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:16.136Z"
+        },
+        "__v": 15
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e03482"
+        },
+        "seedKey": "q-study-kursovoy",
+        "isSeeded": true,
+        "title": "Как разложить курсовой проект на этапы, если дедлайн через три недели?",
+        "description": "Есть тема, есть примерное понимание стека, но всё ощущается как один огромный ком задач. Нужен не “мотивационный” совет, а рабочая схема: как разбить проект, чтобы к защите не осталась паника и недоделанный интерфейс.",
+        "category": "study",
+        "tags": [
+          "курсовой",
+          "дедлайн",
+          "планирование",
+          "react"
+        ],
+        "author": {
+          "$oid": "69caeb12f58a496ca4e03469"
+        },
+        "answers": [
+          {
+            "content": "Разбей на три контура: база, защита, полировка. Первая неделя: структура, база данных, ключевые страницы и маршруты. Вторая: сценарии пользователя, адаптив, тексты ошибок и наполнение контентом. Третья: визуал, тесты, репетиция демонстрации и скриншоты. Если задача не влияет на показ основного сценария, она не должна съедать начало проекта.",
+            "author": {
+              "$oid": "69caeb11f58a496ca4e03459"
+            },
+            "upvotes": [
+              {
+                "$oid": "69caeb12f58a496ca4e03469"
+              },
+              {
+                "$oid": "69caeb11f58a496ca4e03465"
+              },
+              {
+                "$oid": "69caeb11f58a496ca4e03461"
+              }
+            ],
+            "downvotes": [],
+            "isBestAnswer": true,
+            "createdAt": {
+              "$date": "2026-03-30T22:07:16.138Z"
+            },
+            "_id": {
+              "$oid": "69caf4148e0ed6d37fb01605"
+            }
+          },
+          {
+            "content": "Еще сразу выпиши, что показываешь на защите. Очень многие делают наоборот: сначала полируют мелочи, а потом выясняется, что связка “регистрация -> действие -> результат” не готова.",
+            "author": {
+              "$oid": "69caeb12f58a496ca4e0346d"
+            },
+            "upvotes": [
+              {
+                "$oid": "69caeb11f58a496ca4e03459"
+              }
+            ],
+            "downvotes": [],
+            "isBestAnswer": false,
+            "createdAt": {
+              "$date": "2026-03-30T22:07:16.138Z"
+            },
+            "_id": {
+              "$oid": "69caf4148e0ed6d37fb01606"
+            }
+          }
+        ],
+        "views": 231,
+        "upvotes": [
+          {
+            "$oid": "69caeb11f58a496ca4e03459"
+          },
+          {
+            "$oid": "69caeb11f58a496ca4e0345d"
+          },
+          {
+            "$oid": "69caeb12f58a496ca4e0346d"
+          }
+        ],
+        "downvotes": [],
+        "status": "answered",
+        "lastActivityAt": {
+          "$date": "2026-03-30T22:07:16.141Z"
+        },
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.225Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:16.141Z"
+        },
+        "__v": 2
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e03487"
+        },
+        "seedKey": "q-career-portfolio",
+        "isSeeded": true,
+        "title": "Стоит ли класть учебный проект в портфолио, если он выглядит неидеально, но рабочий?",
+        "description": "Есть учебный pet-проект на React + Node, без супер-уникальной идеи, но с авторизацией, БД и нормальной структурой. Думаю, оставлять ли его в портфолио или ждать “идеального” кейса. Боюсь, что слабый визуал все испортит.",
+        "category": "career",
+        "tags": [
+          "портфолио",
+          "react",
+          "junior",
+          "резюме"
+        ],
+        "author": {
+          "$oid": "69caeb12f58a496ca4e0346d"
+        },
+        "answers": [
+          {
+            "content": "Оставлять стоит, если ты умеешь его объяснить и показать решения. Рабочий учебный проект лучше пустого портфолио. Но обязательно упакуй его: краткое описание задачи, стек, 3-4 скрина, что реализовано, где сложность и что бы улучшил дальше.",
+            "author": {
+              "$oid": "69caeb11f58a496ca4e0345d"
+            },
+            "upvotes": [
+              {
+                "$oid": "69caeb12f58a496ca4e0346d"
+              },
+              {
+                "$oid": "69caeb12f58a496ca4e03469"
+              },
+              {
+                "$oid": "69caeb11f58a496ca4e03465"
+              },
+              {
+                "$oid": "69caeb11f58a496ca4e0344f"
+              }
+            ],
+            "downvotes": [],
+            "isBestAnswer": true,
+            "createdAt": {
+              "$date": "2026-03-30T22:07:16.143Z"
+            },
+            "_id": {
+              "$oid": "69caf4148e0ed6d37fb0160a"
+            }
+          }
+        ],
+        "views": 165,
+        "upvotes": [
+          {
+            "$oid": "69caeb11f58a496ca4e0345d"
+          },
+          {
+            "$oid": "69caeb11f58a496ca4e03459"
+          },
+          {
+            "$oid": "69caeb12f58a496ca4e03469"
+          }
+        ],
+        "downvotes": [],
+        "status": "answered",
+        "lastActivityAt": {
+          "$date": "2026-03-30T22:07:16.147Z"
+        },
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.227Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:16.147Z"
+        },
+        "__v": 2
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e0348b"
+        },
+        "seedKey": "q-life-morning",
+        "isSeeded": true,
+        "title": "Как сделать утро собраннее, если постоянно начинаю день с телефона и теряю полчаса?",
+        "description": "Не ищу супер-систему “измени жизнь за день”. Нужны приземленные штуки, которые реально работают: как убрать автоматическое залипание в ленту и быстрее входить в рабочий ритм.",
+        "category": "life",
+        "tags": [
+          "привычки",
+          "утро",
+          "фокус",
+          "день"
+        ],
+        "author": {
+          "$oid": "69caeb12f58a496ca4e03471"
+        },
+        "answers": [
+          {
+            "content": "Самый приземленный вариант: телефон не должен быть первой точкой контакта после пробуждения. Перенеси зарядку подальше от кровати и подготовь маленький офлайн-триггер на утро: вода, список из трех дел, одежда. Чем меньше решений утром, тем меньше шанс скатиться в ленту.",
+            "author": {
+              "$oid": "69caeb11f58a496ca4e03459"
+            },
+            "upvotes": [
+              {
+                "$oid": "69caeb12f58a496ca4e03471"
+              },
+              {
+                "$oid": "69caeb11f58a496ca4e03461"
+              }
+            ],
+            "downvotes": [],
+            "isBestAnswer": true,
+            "createdAt": {
+              "$date": "2026-03-30T22:07:16.149Z"
+            },
+            "_id": {
+              "$oid": "69caf4148e0ed6d37fb0160e"
+            }
+          }
+        ],
+        "views": 119,
+        "upvotes": [
+          {
+            "$oid": "69caeb11f58a496ca4e03465"
+          },
+          {
+            "$oid": "69caeb12f58a496ca4e03469"
+          },
+          {
+            "$oid": "69caeb11f58a496ca4e03459"
+          }
+        ],
+        "downvotes": [],
+        "status": "answered",
+        "lastActivityAt": {
+          "$date": "2026-03-30T22:07:16.155Z"
+        },
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.229Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T22:07:16.155Z"
+        },
+        "__v": 2
+      }
+    ],
+    "consultations": [
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e0348f"
+        },
+        "seedKey": "c-pc-upgrade",
+        "isSeeded": true,
+        "serviceCategory": "pc-plan",
+        "topic": "Подобрать апгрейд для 1440p без полной замены сборки",
+        "description": "Хочу понять, что выгоднее поменять сейчас: видеокарту, блок питания или охлаждение. Нужен спокойный разбор по бюджету.",
+        "goal": "Собрать план апгрейда на ближайшие 3 месяца",
+        "user": {
+          "$oid": "69caeb12f58a496ca4e03471"
+        },
+        "expert": {
+          "$oid": "69caeb11f58a496ca4e0344f"
+        },
+        "format": "voice",
+        "budget": "standard",
+        "preferredDate": {
+          "$date": "2026-04-03T00:00:00Z"
+        },
+        "preferredTime": "19:00",
+        "status": "confirmed",
+        "notes": "Подготовить текущую конфигурацию и список игр.",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.233Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T21:28:50.233Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e03492"
+        },
+        "seedKey": "c-study-roadmap",
+        "isSeeded": true,
+        "serviceCategory": "study-roadmap",
+        "topic": "Разложить курсовой на рабочие спринты до защиты",
+        "description": "Есть тема проекта, стек и часть верстки. Нужен план, чтобы дойти до защиты без хаоса.",
+        "goal": "Сделать недельную карту задач и приоритетов",
+        "user": {
+          "$oid": "69caeb12f58a496ca4e03469"
+        },
+        "expert": {
+          "$oid": "69caeb11f58a496ca4e03459"
+        },
+        "format": "chat",
+        "budget": "starter",
+        "preferredDate": {
+          "$date": "2026-04-02T00:00:00Z"
+        },
+        "preferredTime": "17:30",
+        "status": "matched",
+        "notes": "Собрать ссылки на критерии и текущий репозиторий.",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.235Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T21:28:50.235Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e03495"
+        },
+        "seedKey": "c-cooking-menu",
+        "isSeeded": true,
+        "serviceCategory": "cooking-session",
+        "topic": "Собрать простое меню на 5 дней без дорогих ингредиентов",
+        "description": "Хочу готовить быстрее и перестать каждый вечер думать, что сделать на ужин.",
+        "goal": "Получить меню, список покупок и заготовки на неделю",
+        "user": {
+          "$oid": "69caeb11f58a496ca4e03465"
+        },
+        "expert": {
+          "$oid": "69caeb11f58a496ca4e03455"
+        },
+        "format": "video",
+        "budget": "standard",
+        "preferredDate": {
+          "$date": "2026-04-05T00:00:00Z"
+        },
+        "preferredTime": "13:00",
+        "status": "completed",
+        "notes": "Уже есть базовый набор круп и духовка.",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.236Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T21:28:50.236Z"
+        },
+        "__v": 0
+      },
+      {
+        "_id": {
+          "$oid": "69caeb12f58a496ca4e03498"
+        },
+        "seedKey": "c-career-portfolio",
+        "isSeeded": true,
+        "serviceCategory": "career-review",
+        "topic": "Упаковать учебный проект в портфолио и убрать ощущение “сырости”",
+        "description": "Нужно понять, как подать проект так, чтобы он выглядел как осмысленный кейс, а не просто домашка.",
+        "goal": "Сделать структуру кейса для резюме и Behance/GitHub",
+        "user": {
+          "$oid": "69caeb12f58a496ca4e0346d"
+        },
+        "expert": {
+          "$oid": "69caeb11f58a496ca4e0345d"
+        },
+        "format": "voice",
+        "budget": "pro",
+        "preferredDate": {
+          "$date": "2026-04-06T00:00:00Z"
+        },
+        "preferredTime": "20:15",
+        "status": "pending",
+        "notes": "Нужно принести скриншоты и короткое описание проблемы.",
+        "createdAt": {
+          "$date": "2026-03-30T21:28:50.238Z"
+        },
+        "updatedAt": {
+          "$date": "2026-03-30T21:28:50.238Z"
+        },
+        "__v": 0
+      }
+    ]
+  }
+}

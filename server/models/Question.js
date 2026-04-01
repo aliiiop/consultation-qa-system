@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { QUESTION_CATEGORY_IDS } from '../constants/platform.js'
 
 const answerSchema = new mongoose.Schema({
   content: {
@@ -11,13 +12,34 @@ const answerSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  upvotes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  downvotes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  isBestAnswer: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
-})
+}, { _id: true })
 
 const questionSchema = new mongoose.Schema({
+  seedKey: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  isSeeded: {
+    type: Boolean,
+    default: false
+  },
   title: {
     type: String,
     required: [true, 'Заголовок обязателен'],
@@ -32,32 +54,48 @@ const questionSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Категория обязательна'],
-    enum: ['programming', 'design', 'marketing', 'business', 'education', 'other']
+    enum: QUESTION_CATEGORY_IDS
   },
+  tags: [{
+    type: String,
+    trim: true
+  }],
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   answers: [answerSchema],
+  views: {
+    type: Number,
+    default: 0
+  },
+  upvotes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  downvotes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   status: {
     type: String,
     enum: ['open', 'answered', 'closed'],
     default: 'open'
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
+  lastActivityAt: {
     type: Date,
     default: Date.now
   }
+}, {
+  timestamps: true
 })
 
-// Обновление updatedAt при изменении
 questionSchema.pre('save', function(next) {
-  this.updatedAt = Date.now()
+  this.lastActivityAt = Date.now()
+  if (this.answers.length > 0 && this.status === 'open') {
+    this.status = 'answered'
+  }
   next()
 })
 

@@ -1,9 +1,15 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useContext, useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { NotificationContext } from '../context/NotificationContext'
+import { CONSULTATION_SERVICE_MAP, CONSULTATION_STATUS_MAP } from '../data/platform'
+import { formatDate } from '../utils/formatters'
+import UserAvatar from '../components/UserAvatar'
+import QuestionCard from '../components/QuestionCard'
 
 function Profile() {
   const navigate = useNavigate()
+  const { error: showError } = useContext(NotificationContext)
   const [user, setUser] = useState(null)
   const [myQuestions, setMyQuestions] = useState([])
   const [myConsultations, setMyConsultations] = useState([])
@@ -11,106 +17,154 @@ function Profile() {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
+
     if (!token) {
       navigate('/login')
       return
     }
 
-    const userData = JSON.parse(localStorage.getItem('user'))
-    setUser(userData)
-    fetchUserData(token)
-  }, [])
-
-  const fetchUserData = async (token) => {
     try {
-      setLoading(true)
-      const [questionsRes, consultationsRes] = await Promise.all([
-        axios.get('/api/questions/my', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        axios.get('/api/consultations/my', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
-      ])
-      
-      setMyQuestions(questionsRes.data)
-      setMyConsultations(consultationsRes.data)
+      setUser(JSON.parse(localStorage.getItem('user')))
     } catch (error) {
-      console.error('Ошибка загрузки данных профиля:', error)
-    } finally {
-      setLoading(false)
+      setUser(null)
     }
-  }
+
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true)
+        const [questionsRes, consultationsRes] = await Promise.all([
+          axios.get('/api/questions/my', {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get('/api/consultations/my', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        ])
+
+        setMyQuestions(questionsRes.data)
+        setMyConsultations(consultationsRes.data)
+      } catch (error) {
+        console.error('Ошибка загрузки профиля:', error)
+        showError('Не удалось загрузить профиль')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProfileData()
+  }, [navigate, showError])
+
+  const stats = useMemo(() => {
+    const answersReceived = myQuestions.reduce((acc, question) => acc + (question.answers?.length || 0), 0)
+    const activeConsultations = myConsultations.filter((item) => item.status !== 'completed' && item.status !== 'cancelled').length
+
+    return [
+      { label: 'Вопросов', value: myQuestions.length },
+      { label: 'Ответов получено', value: answersReceived },
+      { label: 'Консультаций', value: myConsultations.length },
+      { label: 'Активных', value: activeConsultations }
+    ]
+  }, [myQuestions, myConsultations])
 
   if (loading) {
-    return <div className="loading">Загрузка профиля...</div>
+    return <section className="surface loading-state">Загрузка профиля...</section>
   }
 
   return (
-    <div>
-      <h1 style={{ marginBottom: '2rem' }}>Мой профиль</h1>
+    <div className="page-stack">
+      <section className="surface profile-hero">
+        <div className="inline-user large">
+          <UserAvatar user={user} size="lg" />
+          <div>
+            <span className="eyebrow">Профиль</span>
+            <h1>{user?.name || user?.username}</h1>
+            <p>{user?.headline || 'Участник сообщества TopicHub'}</p>
+          </div>
+        </div>
 
-      <div className="card">
-        <h2>Информация о пользователе</h2>
-        <p><strong>Имя:</strong> {user?.username}</p>
-        <p><strong>Email:</strong> {user?.email}</p>
-        <p><strong>Дата регистрации:</strong> {new Date(user?.createdAt).toLocaleDateString('ru-RU')}</p>
-      </div>
+        <div className="stat-grid compact">
+          {stats.map((item) => (
+            <article key={item.label} className="stat-card">
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+            </article>
+          ))}
+        </div>
 
-      <div className="card">
-        <h2>Мои вопросы ({myQuestions.length})</h2>
-        {myQuestions.length === 0 ? (
-          <p style={{ color: '#7f8c8d' }}>Вы еще не задавали вопросов</p>
+        <div className="question-detail-meta">
+          <span>{user?.email}</span>
+          <span>{user?.location || 'Локация не указана'}</span>
+          <span>С нами с {formatDate(user?.createdAt)}</span>
+        </div>
+      </section>
+
+      <section className="section-stack">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">Мои вопросы</span>
+            <h2>Опубликованные обсуждения</h2>
+          </div>
+          <Link to="/ask" className="text-link">Создать еще один</Link>
+        </div>
+
+        {myQuestions.length ? (
+          <div className="question-list">
+            {myQuestions.map((question) => (
+              <QuestionCard key={question._id} question={question} compact />
+            ))}
+          </div>
         ) : (
-          myQuestions.map(question => (
-            <div key={question._id} style={{ 
-              borderBottom: '1px solid #eee',
-              paddingBottom: '1rem',
-              marginBottom: '1rem'
-            }}>
-              <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-                <a href={`/question/${question._id}`} style={{ color: '#2c3e50', textDecoration: 'none' }}>
-                  {question.title}
-                </a>
-              </h3>
-              <div style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>
-                <span>Ответов: {question.answers?.length || 0}</span>
-                <span style={{ margin: '0 1rem' }}>|</span>
-                <span>{new Date(question.createdAt).toLocaleDateString('ru-RU')}</span>
-              </div>
-            </div>
-          ))
+          <div className="surface empty-state">
+            <h3>Вопросов пока нет</h3>
+            <p>Опубликуй первый вопрос и он сразу появится в ленте.</p>
+          </div>
         )}
-      </div>
+      </section>
 
-      <div className="card">
-        <h2>Мои консультации ({myConsultations.length})</h2>
-        {myConsultations.length === 0 ? (
-          <p style={{ color: '#7f8c8d' }}>У вас нет запланированных консультаций</p>
+      <section className="section-stack">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">Мои консультации</span>
+            <h2>Статусы и брони</h2>
+          </div>
+          <Link to="/consultations" className="text-link">Новая консультация</Link>
+        </div>
+
+        {myConsultations.length ? (
+          <div className="consultation-list">
+            {myConsultations.map((item) => {
+              const service = CONSULTATION_SERVICE_MAP[item.serviceCategory]
+              const status = CONSULTATION_STATUS_MAP[item.status] || CONSULTATION_STATUS_MAP.pending
+
+              return (
+                <article key={item._id} className="surface consultation-card">
+                  <div className="consultation-top">
+                    <div>
+                      <span className="category-pill">{service?.label || 'Консультация'}</span>
+                      <h3>{item.topic}</h3>
+                    </div>
+                    <span className={`status-pill ${status.tone}`}>{status.label}</span>
+                  </div>
+
+                  <p>{item.goal || item.description}</p>
+
+                  <div className="question-detail-meta">
+                    <span>{formatDate(item.preferredDate)}</span>
+                    <span>{item.preferredTime}</span>
+                    <span>{item.format}</span>
+                    <span>{item.budget}</span>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
         ) : (
-          myConsultations.map(consultation => (
-            <div key={consultation._id} style={{ 
-              borderBottom: '1px solid #eee',
-              paddingBottom: '1rem',
-              marginBottom: '1rem'
-            }}>
-              <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>{consultation.topic}</h3>
-              <p style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>
-                Дата: {new Date(consultation.preferredDate).toLocaleDateString('ru-RU')} в {consultation.preferredTime}
-              </p>
-              <p style={{ fontSize: '0.9rem' }}>
-                Статус: <span style={{ 
-                  color: consultation.status === 'pending' ? '#f39c12' : 
-                         consultation.status === 'confirmed' ? '#27ae60' : '#95a5a6'
-                }}>
-                  {consultation.status === 'pending' ? 'Ожидает подтверждения' :
-                   consultation.status === 'confirmed' ? 'Подтверждена' : 'Завершена'}
-                </span>
-              </p>
-            </div>
-          ))
+          <div className="surface empty-state">
+            <h3>Консультаций пока нет</h3>
+            <p>Выбери ментора и забронируй первый персональный разбор.</p>
+          </div>
         )}
-      </div>
+      </section>
     </div>
   )
 }
