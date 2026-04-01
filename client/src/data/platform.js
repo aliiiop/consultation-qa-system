@@ -122,12 +122,6 @@ export const CONSULTATION_FORMATS = [
   { id: 'video', label: 'Видео', hint: 'Удобно для экрана, макетов и демонстраций' }
 ]
 
-export const CONSULTATION_BUDGETS = [
-  { id: 'starter', label: 'Starter', hint: 'Короткая сессия и базовый план' },
-  { id: 'standard', label: 'Standard', hint: 'Оптимальный разбор с рекомендациями' },
-  { id: 'pro', label: 'Pro', hint: 'Глубокий разбор с детальным фидбеком' }
-]
-
 export const CONSULTATION_STATUS_MAP = {
   pending: { label: 'Ждет подбора ментора', tone: 'warning' },
   matched: { label: 'Ментор найден', tone: 'info' },

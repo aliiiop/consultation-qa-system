@@ -33,6 +33,8 @@ const importData = async () => {
       Consultation.deleteMany({})
     ])
 
+    const consultations = payload.collections.consultations.map(({ budget, ...consultation }) => consultation)
+
     if (payload.collections.users.length) {
       await User.collection.insertMany(payload.collections.users, { ordered: true })
     }
@@ -41,13 +43,13 @@ const importData = async () => {
       await Question.collection.insertMany(payload.collections.questions, { ordered: true })
     }
 
-    if (payload.collections.consultations.length) {
-      await Consultation.collection.insertMany(payload.collections.consultations, { ordered: true })
+    if (consultations.length) {
+      await Consultation.collection.insertMany(consultations, { ordered: true })
     }
 
     console.log(`Import completed from: ${sourcePath}`)
     console.log(
-      `Users: ${payload.collections.users.length}, Questions: ${payload.collections.questions.length}, Consultations: ${payload.collections.consultations.length}`
+      `Users: ${payload.collections.users.length}, Questions: ${payload.collections.questions.length}, Consultations: ${consultations.length}`
     )
   } catch (error) {
     console.error(`Import error: ${error.message}`)

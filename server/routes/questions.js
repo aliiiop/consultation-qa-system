@@ -6,6 +6,45 @@ const router = express.Router()
 
 const authorProjection = 'username name role headline expertise reputation location'
 
+const normalizeVotes = (votes = []) => {
+  const uniqueVotes = new Map()
+
+  votes.forEach((voteId) => {
+    if (voteId) {
+      uniqueVotes.set(voteId.toString(), voteId)
+    }
+  })
+
+  return [...uniqueVotes.values()]
+}
+
+const hasVote = (votes = [], userId) => votes.some((voteId) => voteId.toString() === userId.toString())
+const removeVote = (votes = [], userId) => votes.filter((voteId) => voteId.toString() !== userId.toString())
+
+const applyVoteStep = ({ targetVotes = [], oppositeVotes = [], userId }) => {
+  const normalizedTargetVotes = normalizeVotes(targetVotes)
+  const normalizedOppositeVotes = normalizeVotes(oppositeVotes)
+
+  if (hasVote(normalizedTargetVotes, userId)) {
+    return {
+      targetVotes: removeVote(normalizedTargetVotes, userId),
+      oppositeVotes: normalizedOppositeVotes
+    }
+  }
+
+  if (hasVote(normalizedOppositeVotes, userId)) {
+    return {
+      targetVotes: normalizedTargetVotes,
+      oppositeVotes: removeVote(normalizedOppositeVotes, userId)
+    }
+  }
+
+  return {
+    targetVotes: [...normalizedTargetVotes, userId],
+    oppositeVotes: normalizedOppositeVotes
+  }
+}
+
 const sortQuestions = (questions, sort = 'active') => {
   const list = [...questions]
 
@@ -180,19 +219,14 @@ router.post('/:id/upvote', protect, async (req, res) => {
       return res.status(404).json({ message: 'Вопрос не найден' })
     }
 
-    question.downvotes = question.downvotes.filter(
-      (voteId) => voteId.toString() !== req.user._id.toString()
-    )
+    const { targetVotes, oppositeVotes } = applyVoteStep({
+      targetVotes: question.upvotes,
+      oppositeVotes: question.downvotes,
+      userId: req.user._id
+    })
 
-    const upvoteIndex = question.upvotes.findIndex(
-      (voteId) => voteId.toString() === req.user._id.toString()
-    )
-
-    if (upvoteIndex > -1) {
-      question.upvotes.splice(upvoteIndex, 1)
-    } else {
-      question.upvotes.push(req.user._id)
-    }
+    question.upvotes = targetVotes
+    question.downvotes = oppositeVotes
 
     await question.save()
 
@@ -214,19 +248,14 @@ router.post('/:id/downvote', protect, async (req, res) => {
       return res.status(404).json({ message: 'Вопрос не найден' })
     }
 
-    question.upvotes = question.upvotes.filter(
-      (voteId) => voteId.toString() !== req.user._id.toString()
-    )
+    const { targetVotes, oppositeVotes } = applyVoteStep({
+      targetVotes: question.downvotes,
+      oppositeVotes: question.upvotes,
+      userId: req.user._id
+    })
 
-    const downvoteIndex = question.downvotes.findIndex(
-      (voteId) => voteId.toString() === req.user._id.toString()
-    )
-
-    if (downvoteIndex > -1) {
-      question.downvotes.splice(downvoteIndex, 1)
-    } else {
-      question.downvotes.push(req.user._id)
-    }
+    question.downvotes = targetVotes
+    question.upvotes = oppositeVotes
 
     await question.save()
 
@@ -254,19 +283,14 @@ router.post('/:questionId/answers/:answerId/upvote', protect, async (req, res) =
       return res.status(404).json({ message: 'Ответ не найден' })
     }
 
-    answer.downvotes = answer.downvotes.filter(
-      (voteId) => voteId.toString() !== req.user._id.toString()
-    )
+    const { targetVotes, oppositeVotes } = applyVoteStep({
+      targetVotes: answer.upvotes,
+      oppositeVotes: answer.downvotes,
+      userId: req.user._id
+    })
 
-    const upvoteIndex = answer.upvotes.findIndex(
-      (voteId) => voteId.toString() === req.user._id.toString()
-    )
-
-    if (upvoteIndex > -1) {
-      answer.upvotes.splice(upvoteIndex, 1)
-    } else {
-      answer.upvotes.push(req.user._id)
-    }
+    answer.upvotes = targetVotes
+    answer.downvotes = oppositeVotes
 
     await question.save()
 

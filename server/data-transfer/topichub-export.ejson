@@ -3,7 +3,7 @@
   "version": 1,
   "database": "consultation-qa",
   "exportedAt": {
-    "$date": "2026-04-01T07:12:20.861Z"
+    "$date": "2026-04-01T19:38:24.243Z"
   },
   "counts": {
     "users": 11,
@@ -805,7 +805,6 @@
           "$oid": "69caeb11f58a496ca4e0344f"
         },
         "format": "voice",
-        "budget": "standard",
         "preferredDate": {
           "$date": "2026-04-03T00:00:00Z"
         },
@@ -837,7 +836,6 @@
           "$oid": "69caeb11f58a496ca4e03459"
         },
         "format": "chat",
-        "budget": "starter",
         "preferredDate": {
           "$date": "2026-04-02T00:00:00Z"
         },
@@ -869,7 +867,6 @@
           "$oid": "69caeb11f58a496ca4e03455"
         },
         "format": "video",
-        "budget": "standard",
         "preferredDate": {
           "$date": "2026-04-05T00:00:00Z"
         },
@@ -901,7 +898,6 @@
           "$oid": "69caeb11f58a496ca4e0345d"
         },
         "format": "voice",
-        "budget": "pro",
         "preferredDate": {
           "$date": "2026-04-06T00:00:00Z"
         },

@@ -152,7 +152,6 @@ function Profile() {
                     <span>{formatDate(item.preferredDate)}</span>
                     <span>{item.preferredTime}</span>
                     <span>{item.format}</span>
-                    <span>{item.budget}</span>
                   </div>
                 </article>
               )

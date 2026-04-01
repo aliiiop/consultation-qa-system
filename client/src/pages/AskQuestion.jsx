@@ -105,8 +105,7 @@ function AskQuestion() {
           <span className="eyebrow">Новый пост</span>
           <h1>Опубликовать вопрос</h1>
           <p>
-            Здесь важен не просто красивый блок формы. Вопросы проходят валидацию,
-            попадают в правильный раздел и после сид-наполнения живут рядом с ответами других пользователей.
+            Вопрос проходит проверку, публикуется в выбранном разделе и становится доступен для ответов другим пользователям.
           </p>
         </div>
       </section>
@@ -143,7 +142,7 @@ function AskQuestion() {
               name="tags"
               value={formData.tags}
               onChange={handleChange}
-              placeholder="апгрейд, airflow, budget"
+              placeholder="апгрейд, airflow, корпус"
             />
             {errors.tags && <span className="error">{errors.tags}</span>}
           </div>

@@ -71,5 +71,4 @@ export const CONSULTATION_SERVICES = [
 export const CONSULTATION_SERVICE_IDS = CONSULTATION_SERVICES.map(({ id }) => id)
 
 export const CONSULTATION_FORMATS = ['chat', 'voice', 'video']
-export const CONSULTATION_BUDGETS = ['starter', 'standard', 'pro']
 export const CONSULTATION_STATUSES = ['pending', 'matched', 'confirmed', 'completed', 'cancelled']

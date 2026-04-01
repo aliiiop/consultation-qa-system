@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { NotificationContext } from '../context/NotificationContext'
 import {
-  CONSULTATION_BUDGETS,
   CONSULTATION_FORMATS,
   CONSULTATION_SERVICES,
   CONSULTATION_SERVICE_MAP,
@@ -25,7 +24,6 @@ function Consultations() {
     description: '',
     mentorId: '',
     format: 'chat',
-    budget: 'standard',
     preferredDate: '',
     preferredTime: ''
   })
@@ -88,7 +86,6 @@ function Consultations() {
         description: '',
         mentorId: '',
         format: 'chat',
-        budget: 'standard',
         preferredDate: '',
         preferredTime: ''
       })
@@ -108,8 +105,8 @@ function Consultations() {
           <span className="eyebrow">Mentor sessions</span>
           <h1>Консультации и персональные разборы</h1>
           <p>
-            Это уже не просто “оставьте заявку”. Здесь есть форматы сессий,
-            список менторов, статусы и реальные карточки заявок в базе.
+            Здесь можно выбрать формат встречи, тему, эксперта и удобное время.
+            Все заявки сохраняются в базе и отслеживаются по статусам.
           </p>
         </div>
       </section>
@@ -209,15 +206,6 @@ function Consultations() {
 
           <div className="split-fields">
             <div className="form-group">
-              <label htmlFor="budget">Пакет</label>
-              <select id="budget" name="budget" value={formData.budget} onChange={handleChange}>
-                {CONSULTATION_BUDGETS.map((item) => (
-                  <option key={item.id} value={item.id}>{item.label}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
               <label htmlFor="preferredDate">Дата</label>
               <input
                 id="preferredDate"
@@ -249,7 +237,7 @@ function Consultations() {
 
         <aside className="surface sidebar-card">
           <span className="eyebrow">Менторы</span>
-          <h3>Выдуманные эксперты уже участвуют в проекте</h3>
+          <h3>Эксперты, доступные для консультаций</h3>
           <div className="mentor-stack">
             {experts.map((expert) => (
               <article key={expert._id} className="mentor-snippet">
@@ -318,7 +306,6 @@ function Consultations() {
                     <span>{formatDate(item.preferredDate)}</span>
                     <span>{item.preferredTime}</span>
                     <span>{item.format}</span>
-                    <span>{item.budget}</span>
                   </div>
                 </article>
               )

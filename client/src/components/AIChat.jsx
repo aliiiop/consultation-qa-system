@@ -3,15 +3,22 @@ import axios from 'axios'
 import { NotificationContext } from '../context/NotificationContext'
 import './AIChat.css'
 
+const INITIAL_ASSISTANT_MESSAGE = {
+  role: 'assistant',
+  content: 'Привет. Я помощник TopicHub. Могу помочь с вопросом, ответом или консультацией.'
+}
+
 function AIChat() {
   const { error: showError } = useContext(NotificationContext)
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: 'Привет. Я встроенный помощник TopicHub. Могу помочь уточнить формулировку вопроса или быстро подсказать по теме.'
-    }
-  ])
+  const [aiStatus, setAiStatus] = useState({
+    aiAvailable: false,
+    configured: false,
+    provider: 'knowledge_base',
+    model: null,
+    message: 'Проверка статуса AI...'
+  })
+  const [messages, setMessages] = useState([INITIAL_ASSISTANT_MESSAGE])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const messagesEndRef = useRef(null)
@@ -20,22 +27,69 @@ function AIChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined
+    }
+
+    let isMounted = true
+
+    const fetchStatus = async () => {
+      try {
+        const response = await axios.get('/api/ai/status')
+
+        if (isMounted) {
+          setAiStatus(response.data)
+        }
+      } catch (error) {
+        if (isMounted) {
+          setAiStatus({
+            aiAvailable: false,
+            configured: false,
+            provider: 'knowledge_base',
+            model: null,
+            message: 'Не удалось получить статус AI-сервиса'
+          })
+        }
+      }
+    }
+
+    fetchStatus()
+
+    return () => {
+      isMounted = false
+    }
+  }, [isOpen])
+
   const handleSend = async () => {
     if (!input.trim() || loading) {
       return
     }
 
     const userMessage = input.trim()
-    const nextHistory = [...messages, { role: 'user', content: userMessage }]
+    const nextMessages = [...messages, { role: 'user', content: userMessage }]
+    const historyForApi = nextMessages.slice(1)
+
     setInput('')
-    setMessages(nextHistory)
+    setMessages(nextMessages)
     setLoading(true)
 
     try {
       const response = await axios.post('/api/ai/chat', {
         message: userMessage,
-        history: nextHistory
+        history: historyForApi
       })
+
+      setAiStatus((current) => ({
+        ...current,
+        aiAvailable: response.data.aiType !== 'knowledge_base',
+        configured: response.data.aiType !== 'knowledge_base' || current.configured,
+        provider: response.data.provider || response.data.aiType || 'knowledge_base',
+        model: response.data.model || null,
+        message: response.data.aiType !== 'knowledge_base'
+          ? `Используется ${response.data.provider || response.data.aiType}${response.data.model ? ` (${response.data.model})` : ''}`
+          : (response.data.fallbackReason || current.message)
+      }))
 
       setMessages((current) => [
         ...current,
@@ -43,7 +97,7 @@ function AIChat() {
       ])
     } catch (error) {
       console.error('Ошибка AI-чата:', error)
-      showError(error.response?.data?.message || 'AI-помощник сейчас недоступен')
+      showError(error.response?.data?.message || error.response?.data?.error || 'AI-помощник сейчас недоступен')
       setMessages((current) => [
         ...current,
         {
@@ -64,12 +118,7 @@ function AIChat() {
   }
 
   const clearChat = () => {
-    setMessages([
-      {
-        role: 'assistant',
-        content: 'Чат очищен. Можешь задать новый вопрос.'
-      }
-    ])
+    setMessages([INITIAL_ASSISTANT_MESSAGE])
   }
 
   return (
@@ -88,7 +137,12 @@ function AIChat() {
           <header className="ai-chat-header">
             <div>
               <h3>AI-помощник</h3>
-              <span className="ai-status">Онлайн</span>
+              <span className={`ai-status ${aiStatus.aiAvailable ? 'ready' : 'fallback'}`}>
+                {aiStatus.aiAvailable
+                  ? `${aiStatus.provider}${aiStatus.model ? ` · ${aiStatus.model}` : ''}`
+                  : (aiStatus.configured ? 'Локальный режим' : 'AI не настроен')}
+              </span>
+              <p className="ai-status-note">{aiStatus.message}</p>
             </div>
             <button type="button" className="clear-btn" onClick={clearChat}>
               Очистить
@@ -126,7 +180,7 @@ function AIChat() {
               value={input}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Спроси что-то по теме вопроса или формулировке"
+              placeholder="Спроси что-нибудь по вопросу, ответу или консультации"
               rows="2"
               disabled={loading}
             />

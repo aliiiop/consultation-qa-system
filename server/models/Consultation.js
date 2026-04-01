@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 import {
-  CONSULTATION_BUDGETS,
   CONSULTATION_FORMATS,
   CONSULTATION_SERVICE_IDS,
   CONSULTATION_STATUSES
@@ -48,11 +47,6 @@ const consultationSchema = new mongoose.Schema({
     type: String,
     enum: CONSULTATION_FORMATS,
     default: 'chat'
-  },
-  budget: {
-    type: String,
-    enum: CONSULTATION_BUDGETS,
-    default: 'standard'
   },
   preferredDate: {
     type: Date,

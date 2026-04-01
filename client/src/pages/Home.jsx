@@ -79,12 +79,12 @@ function Home() {
 
         <div className="hero-side">
           <div className="surface hero-panel">
-            <span className="eyebrow">Что изменилось</span>
-            <h3>Вместо абстрактной темы теперь полноценный community hub</h3>
+            <span className="eyebrow">Возможности</span>
+            <h3>Платформа объединяет вопросы по разделам и персональные консультации</h3>
             <ul className="plain-list">
-              <li>Четкие разделы как в сервисах вопросов-ответов</li>
-              <li>Вымышленные пользователи, вопросы и ответы хранятся в БД</li>
-              <li>Консультации стали отдельным продуктом, а не просто формой заявки</li>
+              <li>Вопросы распределены по темам и тегам</li>
+              <li>Ответы, профили пользователей и активности сохраняются в базе данных</li>
+              <li>Для сложных запросов доступны персональные консультации с экспертами</li>
             </ul>
           </div>
 
@@ -96,7 +96,7 @@ function Home() {
                 <span>{question.answers?.length || 0} ответов</span>
               </Link>
             ))}
-            {!questions.length && !loading && <p>После сид-наполнения здесь появятся горячие обсуждения.</p>}
+            {!questions.length && !loading && <p>Когда в системе появятся вопросы, здесь будут показаны последние обсуждения.</p>}
           </div>
         </div>
       </section>
@@ -105,7 +105,7 @@ function Home() {
         <div className="section-head">
           <div>
             <span className="eyebrow">Разделы</span>
-            <h2>Разделение по темам сделано как у больших community-площадок</h2>
+            <h2>Разделы по основным темам платформы</h2>
           </div>
           <Link to="/questions" className="text-link">Смотреть все вопросы</Link>
         </div>
@@ -128,7 +128,7 @@ function Home() {
         <div className="section-head">
           <div>
             <span className="eyebrow">Консультации</span>
-            <h2>Личные разборы с менторами вместо сухой формы записи</h2>
+            <h2>Персональные консультации с экспертами</h2>
           </div>
           <Link to="/consultations" className="text-link">Все форматы</Link>
         </div>
@@ -155,7 +155,7 @@ function Home() {
         <div className="section-head">
           <div>
             <span className="eyebrow">Популярные вопросы</span>
-            <h2>Лента уже выглядит как живая площадка, а не пустой шаблон</h2>
+            <h2>Популярные вопросы и обсуждения</h2>
           </div>
         </div>
 
@@ -167,7 +167,7 @@ function Home() {
           {!questions.length && !loading && (
             <div className="surface empty-state">
               <h3>Пока нет вопросов</h3>
-              <p>Запусти наполнение базы, и в ленте появятся вопросы, ответы и обсуждения.</p>
+              <p>После добавления данных в ленте появятся вопросы, ответы и обсуждения.</p>
             </div>
           )}
         </div>
@@ -177,7 +177,7 @@ function Home() {
         <div className="section-head">
           <div>
             <span className="eyebrow">Менторы</span>
-            <h2>Эксперты уже хранятся в базе и участвуют в консультациях</h2>
+            <h2>Эксперты платформы</h2>
           </div>
         </div>
 

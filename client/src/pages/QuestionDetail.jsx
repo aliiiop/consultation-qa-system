@@ -6,6 +6,17 @@ import { QUESTION_CATEGORY_MAP } from '../data/platform'
 import { formatDate, formatRelativeTime, getScore } from '../utils/formatters'
 import UserAvatar from '../components/UserAvatar'
 
+const hasUserVote = (votes = [], userId) => {
+  if (!userId) {
+    return false
+  }
+
+  return votes.some((voteId) => {
+    const normalizedVoteId = voteId?._id || voteId
+    return normalizedVoteId?.toString() === userId.toString()
+  })
+}
+
 function QuestionDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -57,6 +68,21 @@ function QuestionDetail() {
 
   const category = QUESTION_CATEGORY_MAP[question?.category]
   const questionScore = getScore(question)
+  const questionVoteState = useMemo(() => {
+    if (!currentUser?._id || !question) {
+      return null
+    }
+
+    if (hasUserVote(question.upvotes, currentUser._id)) {
+      return 'upvote'
+    }
+
+    if (hasUserVote(question.downvotes, currentUser._id)) {
+      return 'downvote'
+    }
+
+    return null
+  }, [currentUser, question])
   const sortedAnswers = useMemo(() => {
     const list = [...(question?.answers || [])]
     return list.sort((a, b) => {
@@ -65,6 +91,7 @@ function QuestionDetail() {
       return getScore(b) - getScore(a)
     })
   }, [question])
+  const questionVoteBusy = busyAction === 'question-upvote' || busyAction === 'question-downvote'
 
   const handleQuestionVote = async (type) => {
     if (!token) {
@@ -182,18 +209,20 @@ function QuestionDetail() {
               <div className="vote-stack">
                 <button
                   type="button"
-                  className="vote-btn"
+                  className={`vote-btn ${questionVoteState === 'upvote' ? 'active upvote' : ''}`}
                   onClick={() => handleQuestionVote('upvote')}
-                  disabled={busyAction === 'question-upvote'}
+                  disabled={questionVoteBusy}
+                  aria-pressed={questionVoteState === 'upvote'}
                 >
                   <i className="fa-solid fa-arrow-up" />
                 </button>
                 <strong>{questionScore}</strong>
                 <button
                   type="button"
-                  className="vote-btn"
+                  className={`vote-btn ${questionVoteState === 'downvote' ? 'active downvote' : ''}`}
                   onClick={() => handleQuestionVote('downvote')}
-                  disabled={busyAction === 'question-downvote'}
+                  disabled={questionVoteBusy}
+                  aria-pressed={questionVoteState === 'downvote'}
                 >
                   <i className="fa-solid fa-arrow-down" />
                 </button>

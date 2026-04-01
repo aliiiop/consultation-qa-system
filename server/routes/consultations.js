@@ -96,7 +96,6 @@ router.post('/', protect, async (req, res) => {
       goal,
       serviceCategory,
       format,
-      budget,
       preferredDate,
       preferredTime,
       mentorId
@@ -122,7 +121,6 @@ router.post('/', protect, async (req, res) => {
       goal,
       serviceCategory,
       format,
-      budget,
       preferredDate,
       preferredTime,
       user: req.user._id,

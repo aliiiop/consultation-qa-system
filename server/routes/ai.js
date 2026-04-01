@@ -5,205 +5,316 @@ dotenv.config()
 
 const router = express.Router()
 
-// Сохраняем историю для контекста
-const conversationHistory = {}
+const DEFAULT_AI_PROVIDER = 'auto'
+const DEFAULT_GROQ_MODEL = 'llama-3.1-8b-instant'
+const DEFAULT_OPENROUTER_MODEL = 'meta-llama/llama-3.2-3b-instruct:free'
 
-/**
- * НАСТРОЙКА GROQ AI
- *
- * 1. Получить API ключ:
- *    - Перейти на https://console.groq.com
- *    - Создать аккаунт бесплатно (без платежей!)
- *    - Скопировать API ключ
- *
- * 2. Добавить в .env файл:
- *    GROQ_API_KEY=ваш_ключ_от_groq
- *
- * 3. Установить пакет (если еще не установлен):
- *    npm install groq-sdk
- *
- * 4. ВСЕ! ИИ работает!
- */
+const normalizeSecret = (value = '') => value.trim().replace(/^["']|["']$/g, '')
 
-// Если нет API ключа, используем базу знаний
-const USE_GROQ = !!process.env.GROQ_API_KEY
+const AI_PROVIDER = (process.env.AI_PROVIDER || DEFAULT_AI_PROVIDER).trim().toLowerCase()
+const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || DEFAULT_GROQ_MODEL
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL?.trim() || DEFAULT_OPENROUTER_MODEL
+const rawGroqApiKey = normalizeSecret(process.env.GROQ_API_KEY || '')
+const rawOpenRouterApiKey = normalizeSecret(process.env.OPENROUTER_API_KEY || '')
 
-let groq = null
+const isPlaceholderValue = (value = '') => {
+  const normalized = value.trim().toLowerCase()
 
-// Пытаемся импортировать groq-sdk если установлен
-if (USE_GROQ) {
+  if (!normalized) {
+    return true
+  }
+
+  return [
+    'your_groq_api_key_here',
+    'your_groq_key_here',
+    'your_openrouter_api_key_here',
+    'your_openrouter_key_here',
+    'ваш_ключ_от_groq',
+    'ваш_ключ_от_openrouter'
+  ].includes(normalized)
+}
+
+const providers = {
+  groq: {
+    configured: !isPlaceholderValue(rawGroqApiKey),
+    model: GROQ_MODEL,
+    client: null
+  },
+  openrouter: {
+    configured: !isPlaceholderValue(rawOpenRouterApiKey),
+    model: OPENROUTER_MODEL
+  }
+}
+
+const aiRuntime = {
+  configured: false,
+  ready: false,
+  provider: 'knowledge_base',
+  model: null,
+  reason: 'Не настроен внешний AI-провайдер'
+}
+
+const markProviderReady = (providerName, reason) => {
+  aiRuntime.configured = true
+  aiRuntime.ready = true
+  aiRuntime.provider = providerName
+  aiRuntime.model = providers[providerName]?.model || null
+  aiRuntime.reason = reason
+}
+
+const markProviderUnavailable = (providerName, reason) => {
+  aiRuntime.configured = providerName !== 'knowledge_base'
+  aiRuntime.ready = false
+  aiRuntime.provider = providerName
+  aiRuntime.model = providers[providerName]?.model || null
+  aiRuntime.reason = reason
+}
+
+const selectProvider = () => {
+  if (AI_PROVIDER === 'groq') {
+    return providers.groq.configured ? 'groq' : null
+  }
+
+  if (AI_PROVIDER === 'openrouter') {
+    return providers.openrouter.configured ? 'openrouter' : null
+  }
+
+  if (providers.openrouter.configured) {
+    return 'openrouter'
+  }
+
+  if (providers.groq.configured) {
+    return 'groq'
+  }
+
+  return null
+}
+
+const selectedProvider = selectProvider()
+
+if (selectedProvider === 'groq') {
   try {
     const GroqModule = await import('groq-sdk')
     const Groq = GroqModule.default
-    groq = new Groq({
-      apiKey: process.env.GROQ_API_KEY
+
+    providers.groq.client = new Groq({
+      apiKey: rawGroqApiKey
     })
-    console.log('✅ Groq AI подключен!')
+
+    markProviderReady('groq', `Используется Groq (${providers.groq.model})`)
   } catch (error) {
-    console.warn('⚠️ Groq SDK не установлен. Используется база знаний.')
-    console.warn('Установите: npm install groq-sdk')
+    markProviderUnavailable('groq', `Не удалось инициализировать Groq SDK: ${error.message}`)
+    console.warn(aiRuntime.reason)
   }
+} else if (selectedProvider === 'openrouter') {
+  markProviderReady('openrouter', `Используется OpenRouter (${providers.openrouter.model})`)
+} else {
+  aiRuntime.reason = 'Не задан AI_PROVIDER или отсутствуют валидные API-ключи'
 }
 
-// База знаний (для случая без Groq)
 const knowledgeBase = {
-  'react': 'React - это JavaScript библиотека для создания пользовательских интерфейсов. Основные концепции: компоненты (Components), пропсы (Props), состояние (State), хуки (Hooks - useState, useEffect, useContext)',
-  'hooks': 'React Hooks - это функции которые позволяют использовать state и другие возможности React в функциональных компонентах. Основные: useState (состояние), useEffect (побочные эффекты), useContext (глобальное состояние)',
-  'node': 'Node.js - это серверная платформа на базе JavaScript. Используется для создания backend приложений, REST API, работы с БД',
-  'mongodb': 'MongoDB - это NoSQL база данных, которая хранит данные в формате JSON документов. Очень удобна для JavaScript приложений',
-  'javascript': 'JavaScript - язык программирования для браузера и сервера (Node.js). Используется в frontend (React) и backend (Node.js)',
-  'программирование': 'Программирование - процесс создания программ. Начните с: переменные, циклы, функции → React/Vue → Node.js/Python → БД',
-  'веб-разработка': 'Веб-разработка включает: Frontend (HTML, CSS, JavaScript, React), Backend (Node.js, Express, MongoDB), DevOps (Git, Docker, Deploy)',
-  'консультация': 'Вы можете записаться на консультацию через раздел "Консультации". Там вам помогут эксперты',
-  'вопрос': 'Вы можете задать вопрос в разделе "Задать вопрос". Ответы дают эксперты и другие пользователи',
-  'регистрация': 'Нажмите кнопку "Регистрация" в меню. Введите: имя (3+ символов), email, пароль (6+ символов)',
+  react: 'React это библиотека для создания интерфейсов. Основные идеи: компоненты, props, state, эффекты и маршрутизация.',
+  hooks: 'React Hooks позволяют использовать состояние и эффекты в функциональных компонентах. Чаще всего используют useState, useEffect и useContext.',
+  node: 'Node.js это серверная среда выполнения JavaScript. Ее используют для API, авторизации, работы с файлами и базой данных.',
+  mongodb: 'MongoDB это документная NoSQL база данных. В проекте она хранит пользователей, вопросы, ответы и консультации.',
+  javascript: 'JavaScript используется и на клиенте, и на сервере. В этом проекте фронтенд сделан на React, а backend на Node.js и Express.',
+  консультация: 'Для записи на консультацию открой раздел с консультациями, выбери эксперта, формат и удобное время.',
+  вопрос: 'Чтобы задать вопрос, открой страницу создания вопроса, выбери раздел, добавь описание и теги.',
+  регистрация: 'Для регистрации нужны username, email и пароль. После входа можно задавать вопросы, отвечать и пользоваться консультациями.'
 }
 
-const greetings = ['привет', 'здравствуй', 'добрый', 'hello', 'hi', 'hey']
+const greetings = ['привет', 'здравствуй', 'добрый день', 'hello', 'hi', 'hey']
 const thanks = ['спасибо', 'благодарю', 'thanks', 'спс', 'пасиб']
 
-// Функция для использования местной базы знаний
-function generateLocalResponse(message) {
+const buildConversationMessages = (message, history = []) => {
+  const conversationMessages = [
+    {
+      role: 'system',
+      content: [
+        'Ты AI-помощник платформы TopicHub.',
+        'Отвечай на русском языке кратко, понятно и по делу.',
+        'Ты помогаешь с темами по React, Node.js, MongoDB, JavaScript и функциям самой платформы.',
+        'Если вопрос требует точных шагов, давай их списком без лишней воды.'
+      ].join(' ')
+    }
+  ]
+
+  if (Array.isArray(history) && history.length > 0) {
+    history.slice(-6).forEach((item) => {
+      if (!item?.content || (item.role !== 'user' && item.role !== 'assistant')) {
+        return
+      }
+
+      conversationMessages.push({
+        role: item.role,
+        content: item.content
+      })
+    })
+  }
+
+  conversationMessages.push({
+    role: 'user',
+    content: message
+  })
+
+  return conversationMessages
+}
+
+const generateLocalResponse = (message) => {
   const lowerMessage = message.toLowerCase()
 
-  // Приветствия
-  if (greetings.some(g => lowerMessage.includes(g))) {
-    return 'Привет! 👋 Я AI-помощник этой платформы. Чем я могу помочь? Могу ответить на вопросы о программировании, React, Node.js, MongoDB или помочь разобраться с функциями сайта.'
+  if (greetings.some((item) => lowerMessage.includes(item))) {
+    return 'Привет. Я встроенный помощник TopicHub. Могу подсказать по платформе, формулировке вопроса и базовым темам по разработке.'
   }
 
-  // Благодарности
-  if (thanks.some(t => lowerMessage.includes(t))) {
-    return 'Пожалуйста! 😊 Рад был помочь. Если есть еще вопросы - спрашивайте!'
+  if (thanks.some((item) => lowerMessage.includes(item))) {
+    return 'Пожалуйста. Если хочешь, уточни вопрос, и я отвечу точнее.'
   }
 
-  // Поиск в базе знаний
   for (const [keyword, response] of Object.entries(knowledgeBase)) {
     if (lowerMessage.includes(keyword)) {
       return response
     }
   }
 
-  // Общие вопросы
   if (lowerMessage.includes('помощь') || lowerMessage.includes('help')) {
-    return 'Я помогу с:\n• Вопросами о программировании\n• React, Node.js, MongoDB\n• Навигацией по сайту\n• Советами для начинающих\n\nЧто именно вас интересует?'
+    return 'Я могу помочь с вопросами по React, Node.js, MongoDB, структуре проекта и навигации по платформе.'
   }
 
-  if ((lowerMessage.includes('как') || lowerMessage.includes('с чего')) &&
-      (lowerMessage.includes('начать') || lowerMessage.includes('изучать'))) {
-    return 'Рекомендуемый путь обучения:\n1️⃣ HTML и CSS (основы вёрстки)\n2️⃣ JavaScript (язык программирования)\n3️⃣ React (фреймворк для UI)\n4️⃣ Node.js (backend)\n5️⃣ MongoDB (база данных)\n\nЭто путь, который мы использовали в нашем проекте!'
+  if ((lowerMessage.includes('как') || lowerMessage.includes('с чего')) && lowerMessage.includes('начать')) {
+    return 'Начни с HTML и CSS, затем JavaScript, после этого React, Node.js и MongoDB. Это тот же стек, который используется в проекте.'
   }
 
-  // Дефолтный ответ
-  return 'Интересный вопрос! 🤔 Для детального ответа рекомендую:\n\n1. Задать в разделе "Вопросы" - ответят эксперты\n2. Записаться на консультацию\n3. Переформулировать вопрос\n\nМногие вопросы я смогу ответить если вы дадите больше контекста!'
+  return 'Могу помочь лучше, если ты уточнишь тему, стек, ошибку или ожидаемый результат.'
 }
 
-// @route   POST /api/ai/chat
-// @desc    Общение с AI помощником
-// @access  Public
+const requestGroq = async (message, history) => {
+  const completion = await providers.groq.client.chat.completions.create({
+    model: providers.groq.model,
+    messages: buildConversationMessages(message, history),
+    max_tokens: 500,
+    temperature: 0.7
+  })
+
+  return {
+    provider: 'groq',
+    model: providers.groq.model,
+    response: completion.choices?.[0]?.message?.content?.trim() || 'Не удалось получить содержательный ответ от Groq.'
+  }
+}
+
+const requestOpenRouter = async (message, history) => {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${rawOpenRouterApiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'http://localhost:5173',
+      'X-Title': 'TopicHub'
+    },
+    body: JSON.stringify({
+      model: providers.openrouter.model,
+      messages: buildConversationMessages(message, history),
+      max_tokens: 500,
+      temperature: 0.7
+    })
+  })
+
+  const payload = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    const errorMessage = payload?.error?.message || response.statusText || 'OpenRouter request failed'
+    const error = new Error(errorMessage)
+    error.status = response.status
+    error.payload = payload
+    throw error
+  }
+
+  return {
+    provider: 'openrouter',
+    model: providers.openrouter.model,
+    response: payload?.choices?.[0]?.message?.content?.trim() || 'Не удалось получить содержательный ответ от OpenRouter.'
+  }
+}
+
 router.post('/chat', async (req, res) => {
   try {
-    const { message, history } = req.body
-    const userId = req.body.userId || 'anonymous'
+    const { message, history = [] } = req.body || {}
 
     if (!message || !message.trim()) {
       return res.status(400).json({
-        error: 'Сообщение не может быть пустым',
-        response: 'Пожалуйста, напишите вопрос 😊'
+        message: 'Сообщение не может быть пустым',
+        response: 'Напиши вопрос или описание проблемы.'
       })
     }
 
-    let aiResponse = ''
+    const trimmedMessage = message.trim()
+    let result = null
+    let fallbackReason = aiRuntime.ready ? null : aiRuntime.reason
+    const attemptedProvider = aiRuntime.provider
 
-    // Если Groq доступен - используем настоящий ИИ
-    if (groq && USE_GROQ) {
-      try {
-        // Подготавливаем историю для контекста
-        const conversationMessages = [
-          {
-            role: 'system',
-            content: `Ты helpful AI-помощник (на русском) на платформе для консультаций и вопросов-ответов о программировании.
-            Помогаешь с вопросами о: React, Node.js, JavaScript, MongoDB, веб-разработке.
-            Отвечаешь кратко и по существу. Используешь примеры кода когда нужно.
-            Знаешь о функциях этой платформы: задавание вопросов, консультации, AI помощник.`
-          }
-        ]
-
-        // Добавляем историю если есть
-        if (history && history.length > 0) {
-          history.slice(-5).forEach(msg => { // последние 5 сообщений для контекста
-            conversationMessages.push({
-              role: msg.role,
-              content: msg.content
-            })
-          })
-        }
-
-        // Добавляем текущее сообщение
-        conversationMessages.push({
-          role: 'user',
-          content: message
-        })
-
-        // Запрос к Groq API
-        const completion = await groq.chat.completions.create({
-          messages: conversationMessages,
-          model: 'mixtral-8x7b-32768', // бесплатная модель с бесплатными лимитами
-          max_tokens: 500,
-          temperature: 0.7
-        })
-
-        aiResponse = completion.choices[0].message.content
-      } catch (groqError) {
-        console.error('Ошибка Groq API:', groqError)
-        // Если ошибка с API - использем базу знаний
-        aiResponse = generateLocalResponse(message)
+    try {
+      if (aiRuntime.ready && aiRuntime.provider === 'groq') {
+        result = await requestGroq(trimmedMessage, history)
+      } else if (aiRuntime.ready && aiRuntime.provider === 'openrouter') {
+        result = await requestOpenRouter(trimmedMessage, history)
       }
-    } else {
-      // Используем местную базу знаний
-      aiResponse = generateLocalResponse(message)
+    } catch (providerError) {
+      fallbackReason = `${attemptedProvider} request failed${providerError.status ? ` (${providerError.status})` : ''}: ${providerError.message}`
+
+      if (providerError.status === 401 && attemptedProvider !== 'knowledge_base') {
+        markProviderUnavailable(attemptedProvider, fallbackReason)
+      }
+
+      console.error(fallbackReason)
+    }
+
+    if (!result) {
+      result = {
+        provider: 'knowledge_base',
+        model: null,
+        response: generateLocalResponse(trimmedMessage)
+      }
     }
 
     res.json({
-      response: aiResponse,
+      response: result.response,
       timestamp: new Date(),
-      aiType: USE_GROQ && groq ? 'groq' : 'knowledge_base'
+      aiType: result.provider,
+      provider: result.provider,
+      model: result.model,
+      fallbackReason: result.provider === 'knowledge_base' ? fallbackReason : null
     })
   } catch (error) {
     console.error('Ошибка в /api/ai/chat:', error)
     res.status(500).json({
-      error: 'Ошибка при обработке запроса',
-      response: '😔 Произошла ошибка. Попробуйте переформулировать вопрос.'
+      message: 'Ошибка при обработке запроса',
+      response: 'Не удалось получить ответ от AI-помощника.'
     })
   }
 })
 
-// @route   GET /api/ai/suggestions
-// @desc    Получить предложенные вопросы
-// @access  Public
 router.get('/suggestions', (req, res) => {
-  const suggestions = [
-    'Как начать изучать программирование?',
-    'В чем разница между React Hooks?',
-    'Как работает Node.js?',
-    'Что такое MongoDB и как её использовать?',
-    'Как задать вопрос на нашей платформе?'
-  ]
-
-  res.json({ suggestions })
+  res.json({
+    suggestions: [
+      'Как начать изучать программирование?',
+      'В чем разница между React Hooks?',
+      'Как работает Node.js?',
+      'Что такое MongoDB?',
+      'Как лучше сформулировать вопрос на платформе?'
+    ]
+  })
 })
 
-// @route   GET /api/ai/status
-// @desc    Проверить статус ИИ
-// @access  Public
 router.get('/status', (req, res) => {
   res.json({
-    aiAvailable: groq && USE_GROQ ? true : false,
-    type: groq && USE_GROQ ? 'Groq AI (mixtral-8x7b-32768)' : 'Knowledge Base (local)',
-    message: groq && USE_GROQ
-      ? 'Используется настоящий ИИ через Groq API'
-      : 'Используется местная база знаний (для полного ИИ добавьте GROQ_API_KEY в .env)'
+    aiAvailable: aiRuntime.ready,
+    configured: aiRuntime.configured,
+    provider: aiRuntime.provider,
+    model: aiRuntime.model,
+    type: aiRuntime.ready ? `${aiRuntime.provider} (${aiRuntime.model})` : 'Knowledge Base (local)',
+    message: aiRuntime.reason
   })
 })
 
 export default router
-

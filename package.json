@@ -7,6 +7,8 @@
     "server": "npm --prefix server run dev",
     "build": "npm --prefix client run build",
     "seed": "npm --prefix server run seed",
+    "check:groq": "npm --prefix server run check:groq",
+    "check:openrouter": "npm --prefix server run check:openrouter",
     "export:data": "npm --prefix server run export:data",
     "import:data": "npm --prefix server run import:data",
     "start": "npm --prefix server start"

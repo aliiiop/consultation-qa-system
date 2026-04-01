@@ -6,7 +6,7 @@ function Footer() {
     <footer className="site-footer">
       <div className="container footer-grid">
         <div>
-          <span className="eyebrow">Community hub</span>
+          <span className="eyebrow">Q&A platform</span>
           <h3>{BRAND.name}</h3>
           <p>
             Публичные вопросы по реальным темам и персональные консультации от менторов.
@@ -23,9 +23,9 @@ function Footer() {
         </div>
 
         <div>
-          <h4>Для защиты проекта</h4>
+          <h4>О проекте</h4>
           <p>
-            Есть разделы, ответы, роли пользователей, адаптивный интерфейс, уведомления и сид-данные в БД.
+            В системе есть тематические разделы, ответы пользователей, роли, консультации, уведомления и данные в базе.
           </p>
         </div>
       </div>
