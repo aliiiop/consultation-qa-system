@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "installCommand": "npm install --workspaces --include-workspace-root",
+  "installCommand": "npm install --workspaces --include-workspace-root --legacy-peer-deps",
   "outputDirectory": "client/dist",
   "rewrites": [
     {
